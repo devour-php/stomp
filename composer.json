@@ -1,12 +1,12 @@
 {
-    "name": "twistor/devour-stomp",
+    "name": "devour-php/stomp",
     "type": "library",
     "description": "A stomp client for the Devour framework.",
 
     "require": {
         "php": ">=5.4",
         "fusesource/stomp-php": "~2.1",
-        "twistor/devour": "dev-master"
+        "devour-php/devour": "dev-master"
     },
 
     "require-dev": {
