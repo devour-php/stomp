@@ -13,7 +13,7 @@ use Devour\Table\HasTableFactoryInterface;
 use Devour\Table\HasTableFactoryTrait;
 use Devour\Transporter\TransporterInterface;
 use Devour\Util\Configuration;
-use FuseSource\Stomp\Stomp as StompConnection;
+use FuseSource\Stomp\Stomp as StompClient;
 
 /**
  * Returns STOMP messages.
@@ -23,11 +23,11 @@ class Stomp implements TransporterInterface, HasTableFactoryInterface, Configura
   use HasTableFactoryTrait;
 
   /**
-   * The stomp connection.
+   * The stomp client.
    *
    * @var \FuseSource\Stomp\Stomp
    */
-  protected $connection;
+  protected $client;
 
   /**
    * The number of rows to return at a time.
@@ -39,26 +39,28 @@ class Stomp implements TransporterInterface, HasTableFactoryInterface, Configura
   /**
    * Constructs a Stomp object.
    *
-   * @param \FuseSource\Stomp\Stomp $connection
-   *   The stomp connection.
+   * @param \FuseSource\Stomp\Stomp $client
+   *   The stomp client.
    */
-  public function __construct(StompConnection $connection) {
-    $this->connection = $connection;
+  public function __construct(StompClient $client) {
+    $this->client = $client;
   }
 
   /**
    * {@inheritdoc}
    */
   public function transport(SourceInterface $source) {
-    $this->connection->connect();
-    $this->connection->subscribe((string) $source);
+    if (!$this->client->isConnected()) {
+      $this->client->connect();
+      $this->client->subscribe((string) $source);
+    }
 
-    $message = $this->connection->readFrame();
+    $message = $this->client->readFrame();
 
     $table = $this->getTableFactory()->create();
 
     if ($message != NULL) {
-      $this->connection->ack($message);
+      $this->client->ack($message);
     }
 
     if (!$message) {
@@ -86,9 +88,9 @@ class Stomp implements TransporterInterface, HasTableFactoryInterface, Configura
   public static function fromConfiguration(array $configuration) {
     $defaults = ['username' => NULL, 'password' => NULL];
     $configuration = Configuration::validate($configuration, $defaults, ['broker']);
-    $connection = new StompConnection($configuration['broker']);
+    $client = new StompClient($configuration['broker']);
 
-    return new static($connection);
+    return new static($client);
   }
 
   /**
@@ -106,7 +108,7 @@ class Stomp implements TransporterInterface, HasTableFactoryInterface, Configura
   }
 
   public function __destruct() {
-    $this->connection->disconnect();
+    $this->client->disconnect();
   }
 
   /**
