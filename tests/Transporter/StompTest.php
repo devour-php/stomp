@@ -42,6 +42,10 @@ class StompTest extends DevourTestCase {
                ->method('subscribe')
                ->with($this->equalTo('/debug/test'));
 
+    // Gets called by the destrucor.
+    $connection->expects($this->once())
+               ->method('disconnect');
+
     $stomp = new Stomp($connection);
     $table = $stomp->transport(new Source('/debug/test'));
 
