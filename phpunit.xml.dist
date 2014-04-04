@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php"
-         colors="true"
-         stopOnFailure="false"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true">
+<phpunit bootstrap="vendor/autoload.php" colors="true">
+  <testsuites>
+    <testsuite>
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
 
-    <testsuites>
-      <testsuite name="Devour-stomp test suite">
-        <directory>tests</directory>
-      </testsuite>
-    </testsuites>
-
-    <filter>
-      <whitelist>
-        <directory suffix=".php">src</directory>
-      </whitelist>
-    </filter>
+  <filter>
+    <whitelist>
+      <directory suffix=".php">src</directory>
+    </whitelist>
+  </filter>
 </phpunit>
